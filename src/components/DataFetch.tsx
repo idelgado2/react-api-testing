@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const BASE_URL = "https://jsonplaceholder.typicode.com";
 
@@ -8,22 +8,51 @@ interface Post {
 }
 
 export default function DataFetch() {
+  const [error, setError] = useState<unknown>();
+  const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [page, setPage] = useState(0);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch(`${BASE_URL}/posts`);
-      const posts = (await response.json()) as Post[];
-      setPosts(posts);
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
+
+      setIsLoading(true);
+      try {
+        const response = await fetch(`${BASE_URL}/posts?page=${page}`, {
+          signal: abortControllerRef.current?.signal,
+        });
+        const posts = (await response.json()) as Post[];
+        setPosts(posts);
+      } catch (error: unknown) {
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchPosts();
-  }, []);
+  }, [page]);
+
+  if (error) {
+    return <div>Something went wrong!</div>;
+  }
+
   return (
     <div>
-      <ul>
-        {posts.map((post) => {
-          return <li key={post.id}>{post.title}</li>;
-        })}
-      </ul>
+      <button className="border-2" onClick={() => setPage(page + 1)}>
+        Increase Page ({page})
+      </button>
+      {isLoading && <div>Loading...</div>}
+      {!isLoading && (
+        <ul>
+          {posts.map((post) => {
+            return <li key={post.id}>{post.title}</li>;
+          })}
+        </ul>
+      )}
     </div>
   );
 }
