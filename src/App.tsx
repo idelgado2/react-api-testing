@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import DashboardUsingContext from "./components/DashboardUsingContext";
 import { DashboardContext } from "./Contexts/context";
 
 export interface User {
