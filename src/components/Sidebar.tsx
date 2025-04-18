@@ -1,22 +1,20 @@
-import { User } from "../App";
+import { useUserContext } from "../Contexts/context";
 
-interface SidebarProps {
-  user: User;
-}
+interface SidebarProps {}
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({}: SidebarProps) {
+  const user = useUserContext();
   return (
     <div>
-      <div>{user.name}</div>
-      <div>{user.human}</div>
+      <div>{user?.name}</div>
     </div>
   );
 }
 
-interface ProfileProps {
-  user: User;
-}
+interface ProfileProps {}
 
-export function Profile({ user }: ProfileProps) {
-  return <div>{user.name}</div>;
+export function Profile({}: ProfileProps) {
+  const user = useUserContext();
+
+  return <div>{user?.name}</div>;
 }
