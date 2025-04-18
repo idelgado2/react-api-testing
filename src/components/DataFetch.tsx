@@ -8,7 +8,7 @@ interface Post {
 }
 
 export default function DataFetch() {
-  const [error, setError] = useState<unknown>();
+  const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState(0);
@@ -27,7 +27,11 @@ export default function DataFetch() {
         });
         const posts = (await response.json()) as Post[];
         setPosts(posts);
-      } catch (error: unknown) {
+      } catch (error: any) {
+        if (error.name === "AbortError") {
+          console.log("Aborted");
+          return;
+        }
         setError(error);
       } finally {
         setIsLoading(false);
